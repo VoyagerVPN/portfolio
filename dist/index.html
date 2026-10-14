@@ -51,6 +51,19 @@
 </div>
 <p class="caption">Слева — источник из RSS-ленты (пресс-релиз Razer), справа — материал, который из него подготовил бот: сохранённый результат LLM-обработки.</p>
 </div>
+<div class="try-block reveal" id="newsbot-try">
+<div class="try-offer">
+<h3>Попробуйте на любой статье</h3>
+<p>Вставьте ссылку на статью (например, любую из <a href="https://press.razer.com/newsroom/" target="_blank" rel="noopener">press.razer.com</a>) или её текст — бот подготовит публикацию прямо здесь, на неподготовленных данных. Одна демонстрация в сутки.</p>
+<textarea id="try-input" rows="5" placeholder="Ссылка на статью или её текст…"></textarea>
+<div class="try-actions"><button id="try-run" type="button">Перегнать в пост</button><span id="try-status" role="status"></span></div>
+</div>
+<div class="try-result" hidden>
+<h3 id="try-title"></h3>
+<div id="try-messages"></div>
+<p class="caption">Результат работы бота на неподготовленном тексте. Следующая демонстрация будет доступна через сутки.</p>
+</div>
+</div>
 </article>
 
 <article id="ordering" class="project ordering-layout">
@@ -96,5 +109,64 @@
   window.addEventListener('scroll', request, { passive: true });
   window.addEventListener('resize', request);
   sweep();
+})();
+(function(){
+  var KEY = 'newsbot-try';
+  var ENDPOINT = 'https://www.true-order.ru/newsbot-demo/convert';
+  var wrap = document.getElementById('newsbot-try');
+  if (!wrap) return;
+  var offer = wrap.querySelector('.try-offer');
+  var resultBox = wrap.querySelector('.try-result');
+  var input = document.getElementById('try-input');
+  var button = document.getElementById('try-run');
+  var status = document.getElementById('try-status');
+
+  function readSaved() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (saved && saved.at && saved.data && Date.now() - saved.at < 86400000) return saved;
+      if (saved) localStorage.removeItem(KEY);
+    } catch (e) {}
+    return null;
+  }
+  function showResult(data) {
+    offer.hidden = true;
+    resultBox.hidden = false;
+    document.getElementById('try-title').textContent = data.title || '';
+    var box = document.getElementById('try-messages');
+    box.innerHTML = '';
+    data.messages.forEach(function (m) {
+      var b = document.createElement('div');
+      b.className = 'try-msg';
+      b.textContent = m;
+      box.appendChild(b);
+    });
+  }
+  var saved = readSaved();
+  if (saved) showResult(saved.data);
+
+  button.addEventListener('click', function () {
+    var value = input.value.trim();
+    if (!value) { status.textContent = 'Вставьте ссылку или текст статьи.'; return; }
+    button.disabled = true;
+    input.disabled = true;
+    status.textContent = 'Бот читает материал и готовит публикацию — это занимает до минуты…';
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(value.startsWith('http') ? { url: value } : { text: value.slice(0, 18000) }),
+    }).then(function (r) {
+      return r.json().then(function (body) { return { status: r.status, body: body }; });
+    }).then(function (res) {
+      if (!res.body.ok) throw new Error(res.body.error || 'сервис ответил ' + res.status);
+      var data = { title: res.body.title, messages: res.body.messages };
+      try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data: data })); } catch (e) {}
+      showResult(data);
+    }).catch(function (e) {
+      status.textContent = 'Не получилось: ' + e.message + ' Попробуйте другую ссылку или вставьте текст целиком.';
+      button.disabled = false;
+      input.disabled = false;
+    });
+  });
 })();
 </script></body></html>
