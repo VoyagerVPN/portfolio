@@ -144,3 +144,18 @@ footer .caption { margin-top: 38px; }
   .trust { padding: 40px 0 50px; }
 }
 @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+.embed-block { margin: 46px 0 0; }
+.embed-block h3 { margin-top: 0; }
+.embed-frame { border: 1px solid var(--border); background: #050505; overflow: hidden; }
+.embed-frame iframe { display: block; width: 100%; border: 0; background: #050505; }
+.embed-frame.tg iframe { height: 620px; }
+.embed-frame.phone-embed { width: min(100%, 430px); }
+.embed-frame.phone-embed iframe { height: 740px; }
+.embed-frame > .caption { margin: 12px 0 0; }
+.embed-block > .caption { margin: 12px 0 0; }
+@media (max-width: 1023px) {
+  .embed-frame.tg iframe { height: 560px; }
+  .embed-frame.phone-embed { width: min(100%, 360px); margin: auto; }
+  .embed-frame.phone-embed iframe { height: 680px; }
+}

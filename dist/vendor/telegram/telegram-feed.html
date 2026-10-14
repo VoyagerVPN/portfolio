@@ -1,0 +1,536 @@
+<!doctype html>
+<!-- Демо-воспроизведение сохранённого вывода новостного бота. Оригинальная разметка и стили;
+     палитра и метрики сверены со справочными значениями Telegram (тёмная тема) без копирования файлов. -->
+<html lang="ru" data-demo-note="replay">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Новостной бот · Telegram — демо-воспроизведение</title>
+<style>
+  /* Справочные значения палитры: ночная тема Telegram (#0e1621 фон чата, #17212b панели,
+     #182533 входящий пузырь, #7f91a4 вторичный текст), акцент — ночной синий #3e88f7. */
+  :root{
+    --tg-bg:#0e1621;            /* фон чата */
+    --tg-outer:#0b1017;         /* поле вокруг окна на широких экранах */
+    --tg-panel:#17212b;         /* шапка и панель ввода */
+    --tg-bubble:#182533;        /* пузырь входящего сообщения */
+    --tg-text:#ffffff;
+    --tg-muted:#7f91a4;
+    --tg-accent:#3e88f7;
+    color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--tg-outer);color:var(--tg-text);
+    font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .tg-app{
+    display:flex;flex-direction:column;
+    height:100vh;height:100dvh;min-height:420px;
+    max-width:920px;margin:0 auto;background:var(--tg-bg);
+    border-left:1px solid rgba(255,255,255,.05);border-right:1px solid rgba(255,255,255,.05);
+  }
+
+  /* ── Шапка чата ─────────────────────────────────────────── */
+  .tg-header{
+    flex:none;display:flex;align-items:center;gap:12px;
+    height:56px;padding:0 10px 0 8px;background:var(--tg-panel);
+    box-shadow:0 1px 0 rgba(0,0,0,.3);
+  }
+  .tg-iconbtn{
+    display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;
+    background:transparent;color:var(--tg-muted);cursor:default;
+  }
+  .tg-iconbtn svg{width:22px;height:22px}
+  .tg-avatar{
+    flex:none;width:40px;height:40px;border-radius:50%;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#ff885e,#ff516a);
+  }
+  .tg-avatar svg{width:20px;height:20px}
+  .tg-titles{flex:1;min-width:0;line-height:1.2}
+  .tg-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tg-status{font-size:13px;color:var(--tg-muted)}
+  .tg-status.is-typing{color:var(--tg-accent)}
+
+  /* ── Область чата ───────────────────────────────────────── */
+  .tg-chat{flex:1;position:relative;overflow:hidden}
+  .tg-scroll{
+    position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;
+    padding:14px 14px 6px;
+    display:flex;flex-direction:column;
+  }
+  .tg-scroll::-webkit-scrollbar{width:6px}
+  .tg-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:3px}
+  .tg-scroll::-webkit-scrollbar-track{background:transparent}
+
+  .tg-msgs{
+    display:flex;flex-direction:column;gap:6px;
+    margin-top:auto;             /* при малом наполнении лента прижата к низу, как в чате */
+  }
+  .tg-date{
+    align-self:center;margin:2px 0 6px;padding:4px 12px;border-radius:14px;
+    background:rgba(9,18,28,.55);font-size:13px;color:#fff;
+  }
+
+  @keyframes tg-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .tg-msg,.tg-typing{display:flex;justify-content:flex-start;animation:tg-in .3s ease both}
+
+  .tg-bubble{
+    position:relative;max-width:min(80%,540px);
+    background:var(--tg-bubble);
+    border-radius:16px;border-bottom-left-radius:4px;
+    padding:10px 14px 8px;
+    box-shadow:0 1px 1px rgba(0,0,0,.25);
+  }
+  /* Хвостик входящего пузыря: оригинальный SVG-клин, прилегающий к левой стенке */
+  .tg-msg .tg-bubble::before,
+  .tg-typing .tg-bubble::before{
+    content:"";position:absolute;left:-13px;bottom:0;width:13px;height:18px;
+    background:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='18' viewBox='0 0 13 18'%3E%3Cpath d='M13 0C5 1.5 1 9 0 18L13 18Z' fill='%23182533'/%3E%3C/svg%3E") no-repeat;
+    background-size:13px 18px;
+  }
+
+  .tg-title{font-size:17px;font-weight:600;line-height:1.3;margin:2px 0 6px}
+  .tg-p{margin:0 0 8px}
+  .tg-h{font-size:15px;font-weight:600;margin:6px 0 2px}
+  .tg-ul{margin:2px 0 8px;padding:0;list-style:none}
+  .tg-li{position:relative;padding-left:16px;margin:4px 0}
+  .tg-li::before{
+    content:"";position:absolute;left:2px;top:.6em;
+    width:5px;height:5px;border-radius:50%;background:var(--tg-muted);
+  }
+
+  .tg-photos{display:none;flex-direction:column;gap:6px;margin:6px 0 4px}
+  .tg-photo{
+    border-radius:12px;overflow:hidden;background:#0a0f16;
+    opacity:0;transform:translateY(8px);
+    transition:opacity .55s ease,transform .55s ease;
+  }
+  .tg-photos.is-on .tg-photo{opacity:1;transform:none}
+  .tg-photo img{display:block;width:100%;height:auto}
+
+  .tg-meta{
+    display:flex;justify-content:flex-end;align-items:center;gap:8px;
+    margin:2px 2px 0;font-size:12px;color:var(--tg-muted);line-height:1;
+  }
+  .tg-views{display:inline-flex;align-items:center;gap:4px}
+  .tg-ico{width:14px;height:14px}
+
+  @keyframes tg-blink{50%{opacity:0}}
+  .tg-caret{
+    display:inline-block;width:2px;height:1em;margin-left:1px;
+    background:var(--tg-accent);vertical-align:-2px;
+    animation:tg-blink 1s steps(1) infinite;
+  }
+
+  /* ── Индикатор «печатает…» ──────────────────────────────── */
+  @keyframes tg-dot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+  .tg-bubble--typing{padding:12px 16px;border-bottom-left-radius:4px}
+  .tg-dots{display:inline-flex;gap:4px}
+  .tg-dots i{width:7px;height:7px;border-radius:50%;background:var(--tg-muted);animation:tg-dot 1.1s ease-in-out infinite}
+  .tg-dots i:nth-child(2){animation-delay:.15s}
+  .tg-dots i:nth-child(3){animation-delay:.3s}
+
+  /* ── Финал: кнопка повтора ──────────────────────────────── */
+  .tg-end{
+    align-self:center;display:flex;flex-direction:column;align-items:center;gap:7px;
+    margin:10px 0 12px;opacity:0;transition:opacity .5s ease;pointer-events:none;
+  }
+  .tg-end.is-visible{opacity:1;pointer-events:auto}
+  .tg-replay{
+    display:inline-flex;align-items:center;gap:8px;
+    border:1px solid rgba(62,136,247,.45);border-radius:20px;
+    background:rgba(62,136,247,.14);color:#8ab8ff;
+    padding:8px 18px;font-size:14px;font-family:inherit;cursor:pointer;
+  }
+  .tg-replay:hover{background:rgba(62,136,247,.24)}
+  .tg-replay svg{width:16px;height:16px}
+  .tg-note{font-size:12px;color:var(--tg-muted)}
+
+  /* ── Панель ввода (декоративная, сообщение отправить нельзя) ── */
+  .tg-inputbar{
+    flex:none;display:flex;align-items:center;gap:10px;
+    padding:7px 10px;background:var(--tg-panel);
+  }
+  .tg-field{
+    flex:1;display:flex;align-items:center;gap:10px;
+    background:var(--tg-bg);border-radius:21px;padding:12px 16px;
+    color:var(--tg-muted);font-size:15px;user-select:none;
+  }
+  .tg-field svg{width:22px;height:22px;flex:none}
+  .tg-send{
+    flex:none;width:44px;height:44px;border:0;border-radius:50%;
+    display:grid;place-items:center;background:var(--tg-accent);color:#fff;cursor:default;
+  }
+  .tg-send svg{width:22px;height:22px}
+
+  .tg-noscript{padding:20px;text-align:center;color:var(--tg-muted)}
+
+  /* ── Reduced motion: без анимаций, контент показывается сразу ── */
+  @media (prefers-reduced-motion: reduce){
+    .tg-msg,.tg-typing,.tg-caret,.tg-dots i{animation:none!important}
+    .tg-photo,.tg-end{transition:none!important}
+    .tg-caret{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="tg-app" id="tgApp">
+  <header class="tg-header">
+    <button class="tg-iconbtn" type="button" tabindex="-1" aria-label="Назад">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="tg-avatar" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="#fff"><path d="M5 4h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-4.2l-2.8 2-2.8-2H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm1 4v1.6h5.2V8H6Zm6.8 0v1.6H18V8h-5.2ZM6 10.4V12h5.2v-1.6H6Zm6.8 0V12H18v-1.6h-5.2ZM6 13.6v1.6h3.6v-1.6H6Zm5.2 0v1.6H18v-1.6h-6.8Z"/></svg>
+    </div>
+    <div class="tg-titles">
+      <div class="tg-name">Новостной бот</div>
+      <div class="tg-status" id="tgStatus">бот</div>
+    </div>
+    <button class="tg-iconbtn" type="button" tabindex="-1" aria-label="Поиск">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+    </button>
+    <button class="tg-iconbtn" type="button" tabindex="-1" aria-label="Ещё">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5.5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="18.5" r="1.7"/></svg>
+    </button>
+  </header>
+
+  <main class="tg-chat">
+    <div class="tg-scroll" id="tgScroll">
+      <div class="tg-msgs" id="tgMsgs"></div>
+      <div class="tg-end" id="tgEnd">
+        <button class="tg-replay" id="tgReplay" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v5h5"/><path d="M4.6 10A8 8 0 1 1 6 16.9"/></svg>
+          Смотреть снова
+        </button>
+        <div class="tg-note">Воспроизведение сохранённого материала бота</div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="tg-inputbar" aria-hidden="true">
+    <div class="tg-field">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5l-8 8a5.4 5.4 0 0 1-7.6-7.6l8.4-8.4a3.6 3.6 0 0 1 5.1 5.1l-8.2 8.2a1.8 1.8 0 0 1-2.6-2.6l7.6-7.5"/></svg>
+      Написать сообщение…
+    </div>
+    <button class="tg-send" type="button" tabindex="-1" aria-label="Отправить">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6l-.1 6.6 12.2 1.8-12.2 1.8.1 6.6Z"/></svg>
+    </button>
+  </footer>
+
+  <noscript><div class="tg-noscript">Для показа живой ленты включите JavaScript.</div></noscript>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var FALLBACK_IMG = '../../assets/news-result.png';
+
+  /* Материал — дословно из сохранённого вывода новостного бота (обзор Razer Mako). */
+  var NEWS = {
+    date: '14 октября',
+    messages: [
+      {
+        typeMs: 5200, time: '20:15', views: '1,4K',
+        blocks: [
+          { t:'h', text:'📰 Razer представила линейку настольных игровых колонок Mako' },
+          { t:'p', text:'Razer анонсировала линейку компактных настольных игровых колонок Mako из двух моделей — Mako и Mako X. Она рассчитана на геймеров, которым нужно более полное звучание и глубокий бас в компактном форм-факторе для современных игровых столов. Главное различие: Mako — конфигурация 2.1 с отдельным сабвуфером и более масштабной подсветкой, Mako X — 2.0 с пассивными радиаторами и меньшим корпусом.' }
+        ],
+        photos: [ { src:'img/mako-kv.png', alt:'Пресс-изображение линейки игровых колонок Razer Mako' } ]
+      },
+      {
+        typeMs: 6800, time: '20:16', views: '987',
+        blocks: [
+          { t:'h', text:'Mako: особенности и звук' },
+          { t:'ul', items:[
+            '2.1-канальная конфигурация: настроенные 2,75-дюймовые широкополосные драйверы и отдельный фронтальный 3,5-дюймовый сабвуфер.',
+            'Мощность 40 Вт RMS и 60 Вт пиковой, частотный диапазон с нижней границей 45 Гц.',
+            'Наклонная конструкция направляет звук к уровню ушей, а 7.1-виртуальное объемное звучание расширяет сцену для игр, фильмов и музыки.'
+          ]},
+          { t:'h', text:'Mako X: особенности и звук' },
+          { t:'ul', items:[
+            '2.0-канальная конфигурация: настроенные 2,75-дюймовые широкополосные драйверы и встроенные пассивные радиаторы для расширения низких частот.',
+            'Мощность до 30 Вт RMS и 45 Вт пиковой, частотный диапазон с нижней границей 60 Гц.',
+            'Наклонная конструкция и 7.1-виртуальное объемное звучание; также может работать от стандартного USB-питания до 15 Вт.'
+          ]}
+        ]
+      },
+      {
+        typeMs: 5800, time: '20:18', views: '1,1K',
+        blocks: [
+          { t:'h', text:'Подсветка' },
+          { t:'ul', items:[
+            'Mako: заднепроекционная Razer Chroma RGB подсвечивает стену за столом.',
+            'Заявлено 16,8 млн цветов и реактивные эффекты в более чем 300 играх с поддержкой Chroma.',
+            'Mako X: 10-зонная нижняя подсветка Razer Chroma RGB создает мягкое свечение под колонками.'
+          ]},
+          { t:'h', text:'Подключение' },
+          { t:'ul', items:[
+            'Один кабель USB-C передает питание и аудио.',
+            'При подключении к совместимому источнику USB-C мощностью 30 Вт и выше доступна более высокая выходная мощность.',
+            'Альтернативные подключения: Bluetooth 5.3 и 3,5 мм.'
+          ]}
+        ],
+        photos: [
+          { src:'img/mako-1.png', alt:'Игровые колонки Razer Mako' },
+          { src:'img/mako-x.png', alt:'Игровые колонки Razer Mako X' }
+        ]
+      }
+    ]
+  };
+
+  /* Темп «живой ленты»: суммарно ~32 с — не меньше требуемых 15 секунд полного прочтения. */
+  var T = { initial:1000, typing:2300, photo:1400, pause:1500 };
+
+  var EYE_SVG = '<svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M12 6C7.2 6 3.4 9.3 1.9 12 3.4 14.7 7.2 18 12 18s8.6-3.3 10.1-6C20.6 9.3 16.8 6 12 6Zm0 10a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>';
+
+  var root = document.getElementById('tgApp');
+  var scrollEl = document.getElementById('tgScroll');
+  var msgsEl = document.getElementById('tgMsgs');
+  var statusEl = document.getElementById('tgStatus');
+  var endEl = document.getElementById('tgEnd');
+  var replayBtn = document.getElementById('tgReplay');
+
+  var gen = 0; // поколение прогона: кнопка повтора инвалидирует предыдущую анимацию
+
+  function el(tag, cls){
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    return n;
+  }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function stale(token){ return token.gen !== gen; }
+
+  var pinned = true; // автопрокрутка активна, пока пользователь у нижнего края
+  scrollEl.addEventListener('scroll', function(){
+    pinned = scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight < 140;
+  }, { passive:true });
+
+  function autoScroll(force){
+    if (!pinned && !force) return;
+    scrollEl.scrollTop = scrollEl.scrollHeight;
+  }
+
+  function setStatus(typing){
+    statusEl.textContent = typing ? 'печатает…' : 'бот';
+    statusEl.classList.toggle('is-typing', !!typing);
+  }
+
+  function showTyping(){
+    var row = el('div','tg-typing');
+    row.innerHTML = '<div class="tg-bubble tg-bubble--typing"><span class="tg-dots"><i></i><i></i><i></i></span></div>';
+    msgsEl.appendChild(row);
+    autoScroll(true);
+    setStatus(true);
+    return row;
+  }
+
+  function buildMessage(m){
+    var row = el('div','tg-msg');
+    var bubble = el('div','tg-bubble');
+    var leaves = [];
+    m.blocks.forEach(function(b){
+      if (b.t === 'ul'){
+        var ul = el('ul','tg-ul');
+        b.items.forEach(function(text){
+          var li = el('li','tg-li');
+          li.style.display = 'none';
+          ul.appendChild(li);
+          leaves.push({ node:li, text:text, arr:Array.from(text) });
+        });
+        bubble.appendChild(ul);
+      } else {
+        var node = el(b.t === 'h' ? 'div' : 'p', b.t === 'h' ? 'tg-h' : 'tg-p');
+        node.style.display = 'none';
+        bubble.appendChild(node);
+        leaves.push({ node:node, text:b.text, arr:Array.from(b.text) });
+      }
+    });
+
+    var photosWrap = null;
+    if (m.photos){
+      photosWrap = el('div','tg-photos');
+      m.photos.forEach(function(p, i){
+        var fig = el('div','tg-photo');
+        fig.style.transitionDelay = (i * 90) + 'ms';
+        var img = document.createElement('img');
+        img.src = p.src;
+        img.alt = p.alt;
+        img.decoding = 'async';
+        img.addEventListener('error', function(){
+          // Резервный кадр: локальный скриншот сохранённого результата
+          if (!img.dataset.fb){ img.dataset.fb = '1'; img.src = FALLBACK_IMG; }
+        });
+        fig.appendChild(img);
+        photosWrap.appendChild(fig);
+      });
+      bubble.appendChild(photosWrap);
+    }
+
+    var meta = el('div','tg-meta');
+    meta.style.visibility = 'hidden'; // место под мету резервируем, чтобы пузырь не прыгал
+    meta.innerHTML = '<span class="tg-views">' + EYE_SVG + '<span>' + m.views + '</span></span>'
+                   + '<span class="tg-time">' + m.time + '</span>';
+    bubble.appendChild(meta);
+    row.appendChild(bubble);
+    return { row:row, leaves:leaves, photosWrap:photosWrap, meta:meta };
+  }
+
+  /* Посимвольный набор текста: по кодпоинтам (emoji не рвётся), темп — rAF по времени */
+  function typeInto(leaves, durMs, token){
+    return new Promise(function(done){
+      var total = leaves.reduce(function(s,l){ return s + l.arr.length; }, 0);
+      var per = Math.min(16, Math.max(6, durMs / total)); // мс на символ
+      var caret = el('span','tg-caret');
+      var idx = 0, pos = 0, shown = 0, active = null;
+      var begin = performance.now();
+
+      function activate(){
+        if (active) active.node.removeChild(caret);
+        active = leaves[idx];
+        active.node.style.display = '';
+        active.textNode = document.createTextNode('');
+        active.node.appendChild(active.textNode);
+        active.node.appendChild(caret);
+      }
+      function frame(now){
+        if (stale(token)){ done(false); return; }
+        var target = Math.min(total, Math.floor((now - begin) / per));
+        while (shown < target && idx < leaves.length){
+          if (pos === 0) activate();
+          var l = leaves[idx];
+          pos++; shown++;
+          l.textNode.data = l.arr.slice(0, pos).join('');
+          if (pos >= l.arr.length){ idx++; pos = 0; }
+        }
+        autoScroll();
+        if (shown >= total){
+          if (active) active.node.removeChild(caret);
+          done(!stale(token));
+          return;
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  function revealPhotos(wrap){
+    wrap.style.display = 'flex';
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ wrap.classList.add('is-on'); });
+    });
+  }
+
+  function fillLeaves(built){
+    built.leaves.forEach(function(l){
+      l.node.style.display = '';
+      l.textNode = document.createTextNode(l.text);
+      l.node.appendChild(l.textNode);
+    });
+  }
+
+  function finish(){
+    endEl.classList.add('is-visible');
+    autoScroll(true);
+  }
+
+  /* Живой прогон: печатает… → сообщение → вложения → пауза → … */
+  async function play(token){
+    msgsEl.textContent = '';
+    endEl.classList.remove('is-visible');
+    var date = el('div','tg-date');
+    date.textContent = NEWS.date;
+    msgsEl.appendChild(date);
+    autoScroll(true);
+
+    if (reduced){ renderAll(); return; }
+
+    await sleep(T.initial);
+    if (stale(token)) return;
+
+    for (var i = 0; i < NEWS.messages.length; i++){
+      var m = NEWS.messages[i];
+      var ind = showTyping();
+      await sleep(T.typing);
+      ind.remove();
+      if (stale(token)) return;
+
+      var built = buildMessage(m);
+      msgsEl.appendChild(built.row);
+      autoScroll(true);
+
+      var ok = await typeInto(built.leaves, m.typeMs, token);
+      if (!ok || stale(token)) return;
+
+      built.meta.style.visibility = '';
+      setStatus(false);
+      autoScroll();
+
+      if (built.photosWrap){
+        await sleep(320);
+        if (stale(token)) return;
+        revealPhotos(built.photosWrap);
+        await sleep(T.photo);
+        if (stale(token)) return;
+      }
+      await sleep(T.pause);
+      if (stale(token)) return;
+    }
+    finish();
+  }
+
+  /* Reduced motion: вся лента показывается сразу, без анимации */
+  function renderAll(){
+    for (var i = 0; i < NEWS.messages.length; i++){
+      var built = buildMessage(NEWS.messages[i]);
+      fillLeaves(built);
+      built.meta.style.visibility = '';
+      if (built.photosWrap){
+        built.photosWrap.style.display = 'flex';
+        built.photosWrap.classList.add('is-on');
+      }
+      msgsEl.appendChild(built.row);
+    }
+    finish();
+  }
+
+  function start(){
+    gen++;
+    play({ gen: gen });
+  }
+
+  replayBtn.addEventListener('click', start);
+
+  /* Старт по IntersectionObserver, когда блок появился в кадре */
+  var started = false;
+  function boot(){
+    if (started) return;
+    started = true;
+    NEWS.messages.forEach(function(m){
+      (m.photos || []).forEach(function(p){ var i = new Image(); i.src = p.src; });
+    });
+    start();
+  }
+  if (reduced || !('IntersectionObserver' in window)){
+    boot();
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      if (entries.some(function(e){ return e.isIntersecting; })){
+        io.disconnect();
+        boot();
+      }
+    }, { threshold: 0.3 });
+    io.observe(root);
+  }
+})();
+</script>
+</body>
+</html>
