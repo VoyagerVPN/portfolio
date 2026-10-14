@@ -60,12 +60,14 @@
   /* ── Область чата ───────────────────────────────────────── */
   .tg-chat{flex:1;position:relative;overflow:hidden}
   .tg-scroll{
-    position:absolute;inset:0;overflow-y:hidden;overscroll-behavior:contain;
+    position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;
     padding:14px 14px 6px;
     display:flex;flex-direction:column;
   }
-  .tg-scroll{scrollbar-width:none}
-  .tg-scroll::-webkit-scrollbar{display:none}
+  .tg-scroll{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
+  .tg-scroll::-webkit-scrollbar{width:6px}
+  .tg-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px}
+  .tg-scroll::-webkit-scrollbar-track{background:transparent}
 
   .tg-msgs{
     display:flex;flex-direction:column;gap:6px;
@@ -104,13 +106,12 @@
     width:5px;height:5px;border-radius:50%;background:var(--tg-muted);
   }
 
-  .tg-photos{display:none;flex-direction:column;gap:6px;margin:6px 0 4px}
   .tg-photo{
     border-radius:12px;overflow:hidden;background:#0a0f16;
     opacity:0;transform:translateY(8px);
     transition:opacity .55s ease,transform .55s ease;
   }
-  .tg-photos.is-on .tg-photo{opacity:1;transform:none}
+  .tg-photo.is-on{opacity:1;transform:none}
   .tg-photo img{display:block;width:100%;height:auto}
 
   .tg-meta{
@@ -119,6 +120,22 @@
   }
   .tg-views{display:inline-flex;align-items:center;gap:4px}
   .tg-ico{width:14px;height:14px}
+
+
+  /* ── Рич-пост канала (как в настоящем Telegram) ── */
+  .tg-post{position:relative;padding:4px 6px 6px 10px}
+  .tg-post-name{font-weight:600;font-size:14px;color:#e17076;margin:2px 0 10px}
+  .tg-post-title{font-size:17px;font-weight:600;line-height:1.35;margin:0 0 10px;min-height:1.2em}
+  .tg-post-h{font-size:16px;font-weight:600;line-height:1.4;margin:16px 0 8px}
+  .tg-post-p{font-size:15px;line-height:1.5;margin:0 0 10px;color:#eef2f5}
+  .tg-post-li{position:relative;padding-left:16px;margin:5px 0;font-size:15px;line-height:1.5;color:#eef2f5}
+  .tg-post-li::before{content:"•";position:absolute;left:3px;color:var(--tg-muted)}
+  .tg-post .tg-photo{margin:4px 0 12px}
+  .tg-post-links{display:none;flex-direction:column;gap:3px;margin:14px 0 4px}
+  .tg-post-links a{color:#e8a33d;text-decoration:none;font-size:14.5px;line-height:1.5;overflow-wrap:anywhere}
+  .tg-post-links a:hover{text-decoration:underline}
+  .tg-post-tags{color:#e8a33d;font-size:14.5px;line-height:1.5}
+  .tg-post .tg-meta{margin:6px 2px 0}
 
   @keyframes tg-blink{50%{opacity:0}}
   .tg-caret{
@@ -255,61 +272,53 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var FALLBACK_IMG = '../../assets/news-result.png';
 
-  /* Материал — дословно из сохранённого вывода новостного бота (обзор Razer Mako). */
-  var NEWS = {
+  /* Рич-пост — дословно из сохранённого вывода новостного бота (обзор Razer Mako).
+     Структура повторяет настоящие публикации бота: заголовок, фото, разделы со списками, ссылки. */
+  var POST = {
+    name: 'Новостной бот',
     date: '14 октября',
-    messages: [
-      {
-        typeMs: 5200, time: '20:15', views: '1,4K',
-        blocks: [
-          { t:'h', text:'📰 Razer представила линейку настольных игровых колонок Mako' },
-          { t:'p', text:'Razer анонсировала линейку компактных настольных игровых колонок Mako из двух моделей — Mako и Mako X. Она рассчитана на геймеров, которым нужно более полное звучание и глубокий бас в компактном форм-факторе для современных игровых столов. Главное различие: Mako — конфигурация 2.1 с отдельным сабвуфером и более масштабной подсветкой, Mako X — 2.0 с пассивными радиаторами и меньшим корпусом.' }
-        ],
-        photos: [ { src:'img/mako-kv.png', alt:'Пресс-изображение линейки игровых колонок Razer Mako' } ]
-      },
-      {
-        typeMs: 6800, time: '20:16', views: '987',
-        blocks: [
-          { t:'h', text:'Mako: особенности и звук' },
-          { t:'ul', items:[
-            '2.1-канальная конфигурация: настроенные 2,75-дюймовые широкополосные драйверы и отдельный фронтальный 3,5-дюймовый сабвуфер.',
-            'Мощность 40 Вт RMS и 60 Вт пиковой, частотный диапазон с нижней границей 45 Гц.',
-            'Наклонная конструкция направляет звук к уровню ушей, а 7.1-виртуальное объемное звучание расширяет сцену для игр, фильмов и музыки.'
-          ]},
-          { t:'h', text:'Mako X: особенности и звук' },
-          { t:'ul', items:[
-            '2.0-канальная конфигурация: настроенные 2,75-дюймовые широкополосные драйверы и встроенные пассивные радиаторы для расширения низких частот.',
-            'Мощность до 30 Вт RMS и 45 Вт пиковой, частотный диапазон с нижней границей 60 Гц.',
-            'Наклонная конструкция и 7.1-виртуальное объемное звучание; также может работать от стандартного USB-питания до 15 Вт.'
-          ]}
-        ]
-      },
-      {
-        typeMs: 5800, time: '20:18', views: '1,1K',
-        blocks: [
-          { t:'h', text:'Подсветка' },
-          { t:'ul', items:[
-            'Mako: заднепроекционная Razer Chroma RGB подсвечивает стену за столом.',
-            'Заявлено 16,8 млн цветов и реактивные эффекты в более чем 300 играх с поддержкой Chroma.',
-            'Mako X: 10-зонная нижняя подсветка Razer Chroma RGB создает мягкое свечение под колонками.'
-          ]},
-          { t:'h', text:'Подключение' },
-          { t:'ul', items:[
-            'Один кабель USB-C передает питание и аудио.',
-            'При подключении к совместимому источнику USB-C мощностью 30 Вт и выше доступна более высокая выходная мощность.',
-            'Альтернативные подключения: Bluetooth 5.3 и 3,5 мм.'
-          ]}
-        ],
-        photos: [
-          { src:'img/mako-1.png', alt:'Игровые колонки Razer Mako' },
-          { src:'img/mako-x.png', alt:'Игровые колонки Razer Mako X' }
-        ]
-      }
-    ]
+    time: '20:15',
+    views: '1,4K',
+    title: '📰 Razer представила линейку настольных игровых колонок Mako',
+    elements: [
+      { t:'img', src:'img/mako-kv.png', alt:'Пресс-изображение линейки игровых колонок Razer Mako' },
+      { t:'p', text:'Razer анонсировала линейку компактных настольных игровых колонок Mako из двух моделей — Mako и Mako X. Она рассчитана на геймеров, которым нужно более полное звучание и глубокий бас в компактном форм-факторе для современных игровых столов. Главное различие: Mako — конфигурация 2.1 с отдельным сабвуфером и более масштабной подсветкой, Mako X — 2.0 с пассивными радиаторами и меньшим корпусом.' },
+      { t:'h', text:'Mako: особенности и звук' },
+      { t:'ul', items:[
+        '2.1-канальная конфигурация: настроенные 2,75-дюймовые широкополосные драйверы и отдельный фронтальный 3,5-дюймовый сабвуфер.',
+        'Мощность 40 Вт RMS и 60 Вт пиковой, частотный диапазон с нижней границей 45 Гц.',
+        'Наклонная конструкция направляет звук к уровню ушей, а 7.1-виртуальное объемное звучание расширяет сцену для игр, фильмов и музыки.'
+      ]},
+      { t:'h', text:'Mako X: особенности и звук' },
+      { t:'ul', items:[
+        '2.0-канальная конфигурация: настроенные 2,75-дюймовые широкополосные драйверы и встроенные пассивные радиаторы для расширения низких частот.',
+        'Мощность до 30 Вт RMS и 45 Вт пиковой, частотный диапазон с нижней границей 60 Гц.',
+        'Наклонная конструкция и 7.1-виртуальное объемное звучание; также может работать от стандартного USB-питания до 15 Вт.'
+      ]},
+      { t:'img', src:'img/mako-1.png', alt:'Игровые колонки Razer Mako' },
+      { t:'h', text:'Подсветка' },
+      { t:'ul', items:[
+        'Mako: заднепроекционная Razer Chroma RGB подсвечивает стену за столом.',
+        'Заявлено 16,8 млн цветов и реактивные эффекты в более чем 300 играх с поддержкой Chroma.',
+        'Mako X: 10-зонная нижняя подсветка Razer Chroma RGB создает мягкое свечение под колонками.'
+      ]},
+      { t:'h', text:'Подключение' },
+      { t:'ul', items:[
+        'Один кабель USB-C передает питание и аудио.',
+        'При подключении к совместимому источнику USB-C мощностью 30 Вт и выше доступна более высокая выходная мощность.',
+        'Альтернативные подключения: Bluetooth 5.3 и 3,5 мм.'
+      ]},
+      { t:'img', src:'img/mako-x.png', alt:'Игровые колонки Razer Mako X' }
+    ],
+    links: [
+      { label:'📄 Оригинальный пресс-релиз Razer Newsroom', url:'https://www.razer.com/newsroom/product-news/mako-line' }
+    ],
+    tags: '#Razer #RazerMako #RazerMakoX'
   };
 
-  /* Темп «живой ленты»: суммарно ~32 с — не меньше требуемых 15 секунд полного прочтения. */
-  var T = { initial:1000, typing:2300, photo:1400, pause:1500 };
+  /* Темп «живой ленты»: полный прогон заметно дольше 15 секунд. */
+  var T = { initial: 900, typing: 2300, pause: 1500 };
+  var TYPE_MS = 21000;
 
   var EYE_SVG = '<svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M12 6C7.2 6 3.4 9.3 1.9 12 3.4 14.7 7.2 18 12 18s8.6-3.3 10.1-6C20.6 9.3 16.8 6 12 6Zm0 10a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>';
 
@@ -327,6 +336,16 @@
   var USED_KEY = 'tg-demo-used';
   var TRY_HINT = 'Пришлите ссылкой любую статью — подготовлю из неё публикацию.';
   var USED_NOTE = 'Демо доступно раз в сутки';
+
+  var gen = 0; // поколение прогона: повтор инвалидирует предыдущую анимацию
+
+  function el(tag, cls){
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    return n;
+  }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function stale(token){ return token.gen !== gen; }
 
   function usedToday(){
     try {
@@ -348,51 +367,10 @@
     inputBar.classList.toggle('is-live', !!on);
     inputBar.setAttribute('aria-hidden', on ? 'false' : 'true');
   }
-  function renderSimple(text, cls, time, views){
-    var row = el('div', cls || 'tg-msg');
-    var bubble = el('div', 'tg-bubble');
-    var p = el('p', 'tg-p');
-    p.style.margin = '0';
-    p.textContent = text;
-    bubble.appendChild(p);
-    var meta = el('div', 'tg-meta');
-    meta.style.visibility = 'visible';
-    meta.innerHTML = (views ? '<span class="tg-views">' + EYE_SVG + '<span>' + views + '</span></span>' : '')
-                   + '<span class="tg-time">' + time + '</span>';
-    bubble.appendChild(meta);
-    row.appendChild(bubble);
-    msgsEl.appendChild(row);
-    autoScroll(true);
-    return row;
-  }
-  function renderBotPost(data){
-    var time = nowTime();
-    data.messages.forEach(function(m, i){
-      var msg = { time: time, views: String(1 + i), blocks: [] };
-      if (i === 0 && data.title) msg.blocks.push({ t:'h', text: data.title });
-      msg.blocks.push({ t:'p', text: m });
-      var built = buildMessage(msg);
-      fillLeaves(built);
-      built.meta.style.visibility = '';
-      if (built.photosWrap) built.photosWrap.style.display = 'none';
-      msgsEl.appendChild(built.row);
-    });
-    autoScroll(true);
-  }
 
-  var gen = 0; // поколение прогона: кнопка повтора инвалидирует предыдущую анимацию
-
-  function el(tag, cls){
-    var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    return n;
-  }
-  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
-  function stale(token){ return token.gen !== gen; }
-
-  var pinned = true; // автопрокрутка активна, пока пользователь у нижнего края
+  var pinned = true;
   scrollEl.addEventListener('scroll', function(){
-    pinned = scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight < 140;
+    pinned = scrollEl.scrollHeight - scrollEl.scrollTop - scrollEl.clientHeight < 160;
   }, { passive:true });
 
   function autoScroll(force){
@@ -414,108 +392,133 @@
     return row;
   }
 
-  function buildMessage(m){
-    var row = el('div','tg-msg');
-    var bubble = el('div','tg-bubble');
-    var leaves = [];
-    m.blocks.forEach(function(b){
-      if (b.t === 'ul'){
-        var ul = el('ul','tg-ul');
-        b.items.forEach(function(text){
-          var li = el('li','tg-li');
-          li.style.display = 'none';
-          ul.appendChild(li);
-          leaves.push({ node:li, text:text, arr:Array.from(text) });
-        });
-        bubble.appendChild(ul);
-      } else {
-        var node = el(b.t === 'h' ? 'div' : 'p', b.t === 'h' ? 'tg-h' : 'tg-p');
-        node.style.display = 'none';
-        bubble.appendChild(node);
-        leaves.push({ node:node, text:b.text, arr:Array.from(b.text) });
-      }
-    });
+  /* Сборка рич-поста: все блоки скрыты, текстовые собираются в leaves для посимвольного набора */
+  function buildPost(post){
+    var wrap = el('div','tg-post');
+    var name = el('div','tg-post-name');
+    name.textContent = post.name;
+    wrap.appendChild(name);
 
-    var photosWrap = null;
-    if (m.photos){
-      photosWrap = el('div','tg-photos');
-      m.photos.forEach(function(p, i){
+    var leaves = [];
+    function push(node, text){
+      node.style.display = 'none';
+      wrap.appendChild(node);
+      leaves.push({ node: node, text: text || '', arr: Array.from(text || '') });
+    }
+
+    var title = el('div','tg-post-title');
+    push(title, post.title);
+
+    post.elements.forEach(function(elm){
+      if (elm.t === 'img'){
         var fig = el('div','tg-photo');
-        fig.style.transitionDelay = (i * 90) + 'ms';
+        // до своего хода в наборе фото не занимают место в раскладке,
+        // иначе autoScroll уезжает в пустую зону заглушек и кадр пустеет
+        fig.style.display = 'none';
+        fig.style.transitionDelay = '0ms';
         var img = document.createElement('img');
-        img.src = p.src;
-        img.alt = p.alt;
+        img.src = elm.src;
+        img.alt = elm.alt || '';
         img.decoding = 'async';
         img.addEventListener('error', function(){
-          // Резервный кадр: локальный скриншот сохранённого результата
           if (!img.dataset.fb){ img.dataset.fb = '1'; img.src = FALLBACK_IMG; }
         });
         fig.appendChild(img);
-        photosWrap.appendChild(fig);
-      });
-      bubble.appendChild(photosWrap);
+        wrap.appendChild(fig);
+        leaves.push({ node: fig, img: true, text: '', arr: [] });
+      } else if (elm.t === 'ul'){
+        elm.items.forEach(function(text){
+          var li = el('div','tg-post-li');
+          push(li, text);
+        });
+      } else {
+        push(el('div', elm.t === 'h' ? 'tg-post-h' : 'tg-post-p'), elm.text);
+      }
+    });
+
+    var links = el('div','tg-post-links');
+    (post.links || []).forEach(function(l){
+      var a = document.createElement('a');
+      a.href = l.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = l.label;
+      links.appendChild(a);
+    });
+    if (post.tags){
+      var tags = el('div','tg-post-tags');
+      tags.textContent = post.tags;
+      links.appendChild(tags);
+    }
+    if ((post.links || []).length || post.tags){
+      wrap.appendChild(links);
+      leaves.push({ node: links, block: true, text: '', arr: [] });
     }
 
     var meta = el('div','tg-meta');
-    meta.style.visibility = 'hidden'; // место под мету резервируем, чтобы пузырь не прыгал
-    meta.innerHTML = '<span class="tg-views">' + EYE_SVG + '<span>' + m.views + '</span></span>'
-                   + '<span class="tg-time">' + m.time + '</span>';
-    bubble.appendChild(meta);
-    row.appendChild(bubble);
-    return { row:row, leaves:leaves, photosWrap:photosWrap, meta:meta };
+    meta.style.visibility = 'hidden';
+    meta.innerHTML = '<span class="tg-views">' + EYE_SVG + '<span>' + post.views + '</span></span>'
+                   + '<span class="tg-time">' + post.time + '</span>';
+    wrap.appendChild(meta);
+    return { wrap: wrap, leaves: leaves, meta: meta };
   }
 
-  /* Посимвольный набор текста: по кодпоинтам (emoji не рвётся), темп — rAF по времени */
+  function showLeaf(l){
+    if (l.img){
+      // двойной rAF: переход opacity срабатывает и после display:none
+      l.node.style.display = '';
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ l.node.classList.add('is-on'); });
+      });
+      return;
+    }
+    l.node.style.display = l.block ? 'flex' : '';
+    if (!l.block) l.node.textContent = l.text;
+  }
+
+  /* Посимвольный набор по кодпоинтам; нулевые листья (фото, ссылки) просто открываются */
   function typeInto(leaves, durMs, token){
     return new Promise(function(done){
       var total = leaves.reduce(function(s,l){ return s + l.arr.length; }, 0);
-      var per = Math.min(16, Math.max(6, durMs / total)); // мс на символ
+      var per = total ? Math.min(16, Math.max(6, durMs / total)) : 1;
       var caret = el('span','tg-caret');
       var idx = 0, pos = 0, shown = 0, active = null;
       var begin = performance.now();
 
       function activate(){
-        if (active) active.node.removeChild(caret);
+        if (active && active.node.contains(caret)) active.node.removeChild(caret);
         active = leaves[idx];
-        active.node.style.display = '';
-        active.textNode = document.createTextNode('');
-        active.node.appendChild(active.textNode);
-        active.node.appendChild(caret);
+        showLeaf(active);
+        if (!active.img && !active.block){
+          active.node.textContent = '';
+          active.node.appendChild(caret);
+        }
       }
       function frame(now){
         if (stale(token)){ done(false); return; }
-        var target = Math.min(total, Math.floor((now - begin) / per));
-        while (shown < target && idx < leaves.length){
-          if (pos === 0) activate();
+        var target = total ? Math.min(total, Math.floor((now - begin) / per)) : 0;
+        while (idx < leaves.length && (shown < target || leaves[idx].arr.length === 0)){
           var l = leaves[idx];
+          if (l.arr.length === 0){
+            if (!l.done){ l.done = true; showLeaf(l); }
+            idx++; pos = 0;
+            continue;
+          }
+          if (pos === 0) activate();
           pos++; shown++;
-          l.textNode.data = l.arr.slice(0, pos).join('');
+          active.node.textContent = l.arr.slice(0, pos).join('');
+          active.node.appendChild(caret);
           if (pos >= l.arr.length){ idx++; pos = 0; }
         }
         autoScroll();
-        if (shown >= total){
-          if (active) active.node.removeChild(caret);
+        if (idx >= leaves.length){
+          if (active && active.node.contains(caret)) active.node.removeChild(caret);
           done(!stale(token));
           return;
         }
         requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);
-    });
-  }
-
-  function revealPhotos(wrap){
-    wrap.style.display = 'flex';
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){ wrap.classList.add('is-on'); });
-    });
-  }
-
-  function fillLeaves(built){
-    built.leaves.forEach(function(l){
-      l.node.style.display = '';
-      l.textNode = document.createTextNode(l.text);
-      l.node.appendChild(l.textNode);
     });
   }
 
@@ -530,63 +533,78 @@
     }
   }
 
-  /* Живой прогон: печатает… → сообщение → вложения → пауза → … */
+  function renderSimple(text, cls, time, views){
+    var row = el('div', cls || 'tg-msg');
+    var bubble = el('div', 'tg-bubble');
+    var p = el('p', 'tg-p');
+    p.style.margin = '0';
+    p.textContent = text;
+    bubble.appendChild(p);
+    var meta = el('div', 'tg-meta');
+    meta.style.visibility = 'visible';
+    meta.innerHTML = (views ? '<span class="tg-views">' + EYE_SVG + '<span>' + views + '</span></span>' : '')
+                   + '<span class="tg-time">' + time + '</span>';
+    bubble.appendChild(meta);
+    row.appendChild(bubble);
+    msgsEl.appendChild(row);
+    autoScroll(true);
+    return row;
+  }
+
+  /* Ответ бота на статью посетителя — тем же рич-форматом */
+  function renderBotPost(data){
+    var post = {
+      name: 'Новостной бот',
+      time: nowTime(),
+      views: '1',
+      title: data.title || '',
+      elements: (data.messages || []).map(function(m){ return { t:'p', text:m }; }),
+      links: [],
+      tags: ''
+    };
+    var built = buildPost(post);
+    built.leaves.forEach(function(l){ l.done = true; showLeaf(l); });
+    built.meta.style.visibility = 'visible';
+    msgsEl.appendChild(built.wrap);
+    autoScroll(true);
+  }
+
+  /* Живой прогон: печатает… → заголовок, фото, разделы → ссылки → метаданные */
   async function play(token){
     msgsEl.textContent = '';
     endEl.classList.remove('is-visible');
     var date = el('div','tg-date');
-    date.textContent = NEWS.date;
+    date.textContent = POST.date;
     msgsEl.appendChild(date);
     autoScroll(true);
 
-    if (reduced){ renderAll(); return; }
+    if (reduced){
+      var builtAll = buildPost(POST);
+      builtAll.leaves.forEach(function(l){ l.done = true; showLeaf(l); });
+      builtAll.meta.style.visibility = '';
+      msgsEl.appendChild(builtAll.wrap);
+      autoScroll(true);
+      finish();
+      return;
+    }
 
     await sleep(T.initial);
     if (stale(token)) return;
 
-    for (var i = 0; i < NEWS.messages.length; i++){
-      var m = NEWS.messages[i];
-      var ind = showTyping();
-      await sleep(T.typing);
-      ind.remove();
-      if (stale(token)) return;
+    var ind = showTyping();
+    await sleep(T.typing);
+    ind.remove();
+    if (stale(token)) return;
 
-      var built = buildMessage(m);
-      msgsEl.appendChild(built.row);
-      autoScroll(true);
+    var built = buildPost(POST);
+    msgsEl.appendChild(built.wrap);
+    autoScroll(true);
 
-      var ok = await typeInto(built.leaves, m.typeMs, token);
-      if (!ok || stale(token)) return;
+    var ok = await typeInto(built.leaves, TYPE_MS, token);
+    if (!ok || stale(token)) return;
 
-      built.meta.style.visibility = '';
-      setStatus(false);
-      autoScroll();
-
-      if (built.photosWrap){
-        await sleep(320);
-        if (stale(token)) return;
-        revealPhotos(built.photosWrap);
-        await sleep(T.photo);
-        if (stale(token)) return;
-      }
-      await sleep(T.pause);
-      if (stale(token)) return;
-    }
-    finish();
-  }
-
-  /* Reduced motion: вся лента показывается сразу, без анимации */
-  function renderAll(){
-    for (var i = 0; i < NEWS.messages.length; i++){
-      var built = buildMessage(NEWS.messages[i]);
-      fillLeaves(built);
-      built.meta.style.visibility = '';
-      if (built.photosWrap){
-        built.photosWrap.style.display = 'flex';
-        built.photosWrap.classList.add('is-on');
-      }
-      msgsEl.appendChild(built.row);
-    }
+    built.meta.style.visibility = '';
+    setStatus(false);
     finish();
   }
 
@@ -612,7 +630,6 @@
     tgInput.value = '';
     setInputEnabled(false, 'печатает…');
     var ind = showTyping();
-    setStatus(true);
     fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -643,8 +660,8 @@
   function boot(){
     if (started) return;
     started = true;
-    NEWS.messages.forEach(function(m){
-      (m.photos || []).forEach(function(p){ var i = new Image(); i.src = p.src; });
+    POST.elements.forEach(function(elm){
+      if (elm.t === 'img'){ var i = new Image(); i.src = elm.src; }
     });
     start();
   }
