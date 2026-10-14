@@ -317,7 +317,7 @@
   };
 
   /* Темп «живой ленты»: полный прогон заметно дольше 15 секунд. */
-  var T = { initial: 900, typing: 2300, pause: 1500 };
+  var T = { initial: 900, typing: 2300, pause: 1500, reply: 9000 };
   var TYPE_MS = 21000;
 
   var EYE_SVG = '<svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M12 6C7.2 6 3.4 9.3 1.9 12 3.4 14.7 7.2 18 12 18s8.6-3.3 10.1-6C20.6 9.3 16.8 6 12 6Zm0 10a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>';
@@ -551,8 +551,9 @@
     return row;
   }
 
-  /* Ответ бота на статью посетителя — тем же рич-форматом */
-  function renderBotPost(data){
+  /* Ответ бота на статью посетителя — тем же рич-форматом, с живым посимвольным набором */
+  async function renderBotPost(data){
+    var token = { gen: gen };
     var post = {
       name: 'Новостной бот',
       time: nowTime(),
@@ -563,10 +564,13 @@
       tags: ''
     };
     var built = buildPost(post);
-    built.leaves.forEach(function(l){ l.done = true; showLeaf(l); });
-    built.meta.style.visibility = 'visible';
     msgsEl.appendChild(built.wrap);
     autoScroll(true);
+    await typeInto(built.leaves, T.reply, token);
+    if (stale(token)) return;
+    built.meta.style.visibility = '';
+    setStatus(false);
+    autoScroll();
   }
 
   /* Живой прогон: печатает… → заголовок, фото, разделы → ссылки → метаданные */
@@ -636,15 +640,15 @@
       body: JSON.stringify(isUrl ? { url: text } : { text: text.slice(0, 18000) })
     }).then(function(r){ return r.json(); }).then(function(body){
       ind.remove();
-      setStatus(false);
       if (!body.ok){
+        setStatus(false);
         renderSimple('Не получилось: ' + (body.error || 'попробуйте другую статью') + '.', 'tg-msg tg-msg--err', nowTime(), null);
         if (!usedToday()) setInputEnabled(true);
         return;
       }
       markUsed();
-      renderBotPost(body);
       setInputEnabled(false, USED_NOTE);
+      renderBotPost(body); // статус «печатает…» гаснет в конце набора ответа
     }).catch(function(){
       ind.remove();
       setStatus(false);
