@@ -22,13 +22,35 @@
 
 <article id="news" class="project">
 <div class="project-heading reveal"><p class="eyebrow">01 · Автоматизация контента</p><h2>Новостной Telegram-бот</h2><p class="subtitle">От материалов из нескольких источников до публикации на русском языке.</p></div>
-<div class="story reveal"><div>
+<div class="reveal">
 <h3>Задача</h3><p>Объединить новости из RSS, YouTube и email-рассылки в одном процессе: находить новые материалы, отбирать подходящие и готовить публикации для Telegram.</p>
 <h3>Мой вклад</h3><p>Разработал бота, подключил источники и LLM. Настроил отбор и адаптацию материалов: подробный обзор для новых устройств и краткое изложение для событий и анонсов.</p>
-</div><figure class="news-shot"><a href="assets/news-result.png" target="_blank"><img src="assets/news-result.png" width="1280" height="800" alt="Русскоязычный материал о колонках Razer Mako, подготовленный новостным ботом" loading="lazy"></a><figcaption>Результат обработки в HTML-просмотре. Это сохранённый материал бота.</figcaption></figure></div>
+</div>
 <ul class="result-stats reveal" aria-label="Результат"><li><strong>3 типа источников</strong><span>RSS, YouTube и email-рассылка в одном процессе</span></li><li><strong>2 формата публикаций</strong><span>подробный обзор и краткое изложение</span></li><li><strong>Готовые посты</strong><span>русский текст, изображения и ссылки на источники</span></li></ul>
 <ul class="tech-tags reveal" aria-label="Технологии"><li>Python</li><li>RSS</li><li>IMAP</li><li>LLM API</li><li>Telegram Bot API</li><li>SQLite</li></ul>
-<div class="embed-block reveal"><h3>Лента бота в интерфейсе Telegram</h3><div class="embed-frame tg"><iframe src="./vendor/telegram/telegram-feed.html" title="Воспроизведение сохранённого материала бота в интерфейсе, стилизованном под Telegram" loading="lazy"></iframe></div><p class="caption">Живая лента: воспроизведение сохранённого материала бота в интерфейсе, стилизованном под Telegram.</p></div>
+<div class="transform reveal">
+<div class="transform-pipeline" aria-label="Путь материала"><span>RSS-источник</span><i>→</i><span>Отбор материала</span><i>→</i><span>LLM-адаптация</span><i>→</i><span>Публикация в Telegram</span></div>
+<div class="transform-grid">
+<div class="transform-src">
+<p class="src-chip">Источник · press.razer.com · 22.09.2026</p>
+<h3 class="src-title">Compact Design, Immersive Sound — Razer Unveils the Mako Desktop Gaming Speakers</h3>
+<p class="src-quote">“The Mako line redefines what compact desktop audio can deliver, bringing full, immersive sound to a space-efficient form factor.”</p>
+<ul class="src-sections">
+<li>Big Sound. Small Footprint.</li>
+<li>Mako: Brilliant Vibes. Expansive Sound.</li>
+<li>Mako X: Compact Design. Room-Filling Sound.</li>
+<li>Compact Footprint. Full-Scale Sound.</li>
+<li>One Line. Two Ways to Upgrade.</li>
+</ul>
+<a class="src-link" href="https://www.razer.com/newsroom/product-news/mako-line" target="_blank" rel="noopener">Открыть исходную статью ↗</a>
+</div>
+<div class="transform-out">
+<p class="src-chip out">Публикация бота · сохранённый материал</p>
+<div class="embed-frame tg"><iframe src="./vendor/telegram/telegram-feed.html" title="Воспроизведение сохранённого материала бота в интерфейсе, стилизованном под Telegram" loading="lazy"></iframe></div>
+</div>
+</div>
+<p class="caption">Слева — источник из RSS-ленты (пресс-релиз Razer), справа — материал, который из него подготовил бот: сохранённый результат LLM-обработки.</p>
+</div>
 </article>
 
 <article id="ordering" class="project ordering-layout">
