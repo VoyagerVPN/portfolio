@@ -152,20 +152,12 @@
   .tg-dots i:nth-child(2){animation-delay:.15s}
   .tg-dots i:nth-child(3){animation-delay:.3s}
 
-  /* ── Финал: кнопка повтора ──────────────────────────────── */
+  /* ── Финал ленты ────────────────────────────────────────── */
   .tg-end{
     align-self:center;display:flex;flex-direction:column;align-items:center;gap:7px;
     margin:10px 0 12px;opacity:0;transition:opacity .5s ease;pointer-events:none;
   }
   .tg-end.is-visible{opacity:1;pointer-events:auto}
-  .tg-replay{
-    display:inline-flex;align-items:center;gap:8px;
-    border:1px solid rgba(62,136,247,.45);border-radius:20px;
-    background:rgba(62,136,247,.14);color:#8ab8ff;
-    padding:8px 18px;font-size:14px;font-family:inherit;cursor:pointer;
-  }
-  .tg-replay:hover{background:rgba(62,136,247,.24)}
-  .tg-replay svg{width:16px;height:16px}
   .tg-note{font-size:12px;color:var(--tg-muted)}
 
   /* ── Панель ввода: после прогона становится живой ── */
@@ -243,21 +235,17 @@
     <div class="tg-scroll" id="tgScroll">
       <div class="tg-msgs" id="tgMsgs"></div>
       <div class="tg-end" id="tgEnd">
-        <button class="tg-replay" id="tgReplay" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5v5h5"/><path d="M4.6 10A8 8 0 1 1 6 16.9"/></svg>
-          Смотреть снова
-        </button>
-        <div class="tg-note">Воспроизведение сохранённого материала бота</div>
+        <div class="tg-note">Сохранённая публикация новостного бота</div>
       </div>
     </div>
   </main>
 
-  <footer class="tg-inputbar" id="tgInputBar" aria-hidden="true">
+  <footer class="tg-inputbar is-live" id="tgInputBar" aria-hidden="false">
     <div class="tg-field">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5l-8 8a5.4 5.4 0 0 1-7.6-7.6l8.4-8.4a3.6 3.6 0 0 1 5.1 5.1l-8.2 8.2a1.8 1.8 0 0 1-2.6-2.6l7.6-7.5"/></svg>
-      <input class="tg-field-input" id="tgInput" type="text" placeholder="Написать сообщение…" disabled aria-label="Сообщение боту">
+      <input class="tg-field-input" id="tgInput" type="text" placeholder="Попробуйте бота — вставьте ссылку на любую статью" aria-label="Сообщение боту">
     </div>
-    <button class="tg-send" id="tgSend" type="button" disabled aria-label="Отправить">
+    <button class="tg-send" id="tgSend" type="button" aria-label="Отправить">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4 21 12 3.4 3.6l-.1 6.6 12.2 1.8-12.2 1.8.1 6.6Z"/></svg>
     </button>
   </footer>
@@ -316,9 +304,9 @@
     tags: '#Razer #RazerMako #RazerMakoX'
   };
 
-  /* Темп «живой ленты»: полный прогон заметно дольше 15 секунд. */
-  var T = { initial: 900, typing: 2300, pause: 1500, reply: 9000 };
-  var TYPE_MS = 21000;
+  /* Темп живого набора: сохранённая публикация показывается сразу,
+     посимвольно бот пишет только ответ на статью посетителя. */
+  var T = { reply: 4500 };
 
   var EYE_SVG = '<svg class="tg-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M12 6C7.2 6 3.4 9.3 1.9 12 3.4 14.7 7.2 18 12 18s8.6-3.3 10.1-6C20.6 9.3 16.8 6 12 6Zm0 10a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>';
 
@@ -327,14 +315,12 @@
   var msgsEl = document.getElementById('tgMsgs');
   var statusEl = document.getElementById('tgStatus');
   var endEl = document.getElementById('tgEnd');
-  var replayBtn = document.getElementById('tgReplay');
   var inputBar = document.getElementById('tgInputBar');
   var tgInput = document.getElementById('tgInput');
   var tgSend = document.getElementById('tgSend');
 
   var ENDPOINT = 'https://www.true-order.ru/newsbot-demo/convert';
   var USED_KEY = 'tg-demo-used';
-  var TRY_HINT = 'Пришлите ссылкой любую статью — подготовлю из неё публикацию.';
   var USED_NOTE = 'Демо доступно раз в сутки';
 
   var gen = 0; // поколение прогона: повтор инвалидирует предыдущую анимацию
@@ -344,7 +330,6 @@
     if (cls) n.className = cls;
     return n;
   }
-  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
   function stale(token){ return token.gen !== gen; }
 
   function usedToday(){
@@ -363,7 +348,7 @@
   function setInputEnabled(on, placeholder){
     tgInput.disabled = !on;
     tgSend.disabled = !on;
-    tgInput.placeholder = placeholder || (on ? 'Ссылка на статью с press.razer.com…' : 'Написать сообщение…');
+    tgInput.placeholder = placeholder || (on ? 'Попробуйте бота — вставьте ссылку на любую статью' : 'Написать сообщение…');
     inputBar.classList.toggle('is-live', !!on);
     inputBar.setAttribute('aria-hidden', on ? 'false' : 'true');
   }
@@ -529,7 +514,6 @@
       setInputEnabled(false, USED_NOTE);
     } else {
       setInputEnabled(true);
-      renderSimple(TRY_HINT, null, nowTime(), null);
     }
   }
 
@@ -573,51 +557,27 @@
     autoScroll();
   }
 
-  /* Живой прогон: печатает… → заголовок, фото, разделы → ссылки → метаданные */
-  async function play(token){
+  /* Сохранённая публикация показывается сразу: смотреть набор демо-текста
+     незачем, живой набор оставлен только для ответов на статьи посетителя */
+  function play(){
     msgsEl.textContent = '';
     endEl.classList.remove('is-visible');
     var date = el('div','tg-date');
     date.textContent = POST.date;
     msgsEl.appendChild(date);
-    autoScroll(true);
-
-    if (reduced){
-      var builtAll = buildPost(POST);
-      builtAll.leaves.forEach(function(l){ l.done = true; showLeaf(l); });
-      builtAll.meta.style.visibility = '';
-      msgsEl.appendChild(builtAll.wrap);
-      autoScroll(true);
-      finish();
-      return;
-    }
-
-    await sleep(T.initial);
-    if (stale(token)) return;
-
-    var ind = showTyping();
-    await sleep(T.typing);
-    ind.remove();
-    if (stale(token)) return;
 
     var built = buildPost(POST);
+    built.leaves.forEach(function(l){ l.done = true; showLeaf(l); });
+    built.meta.style.visibility = '';
     msgsEl.appendChild(built.wrap);
     autoScroll(true);
-
-    var ok = await typeInto(built.leaves, TYPE_MS, token);
-    if (!ok || stale(token)) return;
-
-    built.meta.style.visibility = '';
-    setStatus(false);
     finish();
   }
 
   function start(){
     gen++;
-    play({ gen: gen });
+    play();
   }
-
-  replayBtn.addEventListener('click', start);
 
   /* Демо на своей статье: посетитель шлёт ссылку/текст — бот отвечает публикацией */
   function sendUser(){
@@ -664,10 +624,20 @@
   function boot(){
     if (started) return;
     started = true;
+    // пост показывается сразу и сразу скроллится к низу — ждём загрузки фото,
+    // иначе их высоты приходят позже и вьюпорт остаётся не на месте
+    var pending = [];
     POST.elements.forEach(function(elm){
-      if (elm.t === 'img'){ var i = new Image(); i.src = elm.src; }
+      if (elm.t === 'img'){
+        var i = new Image();
+        i.src = elm.src;
+        pending.push(new Promise(function(res){
+          if (i.complete) res();
+          else { i.onload = res; i.onerror = res; }
+        }));
+      }
     });
-    start();
+    Promise.all(pending).then(start);
   }
   if (reduced || !('IntersectionObserver' in window)){
     boot();
