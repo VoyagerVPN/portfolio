@@ -542,10 +542,14 @@
       name: 'Новостной бот',
       time: nowTime(),
       views: '1',
-      title: data.title || '',
-      elements: (data.messages || []).map(function(m){ return { t:'p', text:m }; }),
-      links: [],
-      tags: ''
+      title: typeof data.title === 'string' ? data.title : '',
+      elements: Array.isArray(data.elements) ? data.elements.filter(function(elm){
+        return elm && (elm.t === 'img' ? !!elm.src : typeof elm.text === 'string' || (elm.t === 'ul' && Array.isArray(elm.items)));
+      }) : [],
+      links: Array.isArray(data.links) ? data.links.filter(function(l){
+        return l && typeof l.url === 'string' && typeof l.label === 'string';
+      }) : [],
+      tags: typeof data.tags === 'string' ? data.tags : ''
     };
     var built = buildPost(post);
     msgsEl.appendChild(built.wrap);
