@@ -1,38 +1,78 @@
 <!doctype html>
 <html lang="ru">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="description" content="Проекты Антона Миненко: автоматизация новостей, сервис самовывоза и сайт сообщества. Задачи, личный вклад и демонстрации."><title>Антон Миненко · Проекты</title><link rel="stylesheet" href="style.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="description" content="Проекты Антона Миненко: автоматизация новостей, сервис самовывоза и сайт сообщества. Задачи, личный вклад и демонстрации."><title>Антон Миненко · Проекты</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Антон Миненко">
+<meta property="og:title" content="Антон Миненко · Проекты">
+<meta property="og:description" content="AI-автоматизация и интеграции: новостной бот, прототип сервиса самовывоза, сайт сообщества. Назначение продуктов, личный вклад и работающие интерфейсы.">
+<meta property="og:url" content="https://voyagervpn.github.io/portfolio/">
+<meta property="og:image" content="https://voyagervpn.github.io/portfolio/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
+<link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="style.css"></head>
 <body>
+<div id="trueorder-background" aria-hidden="true"></div><div class="background-noise" aria-hidden="true"></div>
 <header class="top"><a class="name" href="#top">Антон Миненко</a><nav aria-label="Проекты"><a href="#news">Новостной бот</a><a href="#ordering">Самовывоз</a><a href="#community">Сообщество</a></nav><a class="contact" href="mailto:SSalvadoRR_official@mail.ru">Написать мне ↗</a></header>
-<main id="top">
-<section class="intro"><p class="eyebrow">AI-автоматизация и интеграции</p><h1>Мои проекты</h1><p class="lead">Разрабатываю приложения и автоматизирую работу с данными. Здесь можно увидеть назначение продуктов, мой вклад и работу интерфейсов.</p><p class="note">В разработке использую Codex и AI-агентов. Определяю требования и устройство решения, связываю сервисы и довожу пользовательские сценарии до работающего результата.</p></section>
+<main id="top" data-scroll-pin>
+<section class="intro"><p class="eyebrow">AI-автоматизация и интеграции</p><h1>Мои проекты</h1><p class="lead">Разрабатываю приложения и автоматизирую работу с данными. Здесь можно увидеть назначение продуктов, мой вклад и работу интерфейсов.</p><p class="note">В разработке использую Codex и AI-агентов. Определяю требования и устройство решения, связываю сервисы и довожу пользовательские сценарии до работающего результата.</p><a class="intro-contact" href="mailto:SSalvadoRR_official@mail.ru">Написать мне ↗</a></section>
 
 <article id="news" class="project">
-<div class="project-heading"><p class="eyebrow">01 · Автоматизация контента</p><h2>Новостной Telegram-бот</h2><p class="subtitle">От материалов из нескольких источников до публикации на русском языке.</p></div>
-<div class="story"><div>
+<div class="project-heading reveal"><p class="eyebrow">01 · Автоматизация контента</p><h2>Новостной Telegram-бот</h2><p class="subtitle">От материалов из нескольких источников до публикации на русском языке.</p></div>
+<div class="story reveal"><div>
 <h3>Задача</h3><p>Объединить новости из RSS, YouTube и email-рассылки в одном процессе: находить новые материалы, отбирать подходящие и готовить публикации для Telegram.</p>
 <h3>Мой вклад</h3><p>Разработал бота, подключил источники и LLM. Настроил отбор и адаптацию материалов: подробный обзор для новых устройств и краткое изложение для событий и анонсов.</p>
-<h3>Результат</h3><p>Бот собирает материалы, обрабатывает текст и публикует русскоязычные сообщения с изображениями и ссылками на источники. На странице показан сохранённый пример подготовленного материала о продуктах Razer.</p><p class="tech">Python · RSS · IMAP · LLM API · Telegram Bot API · SQLite</p>
 </div><figure class="news-shot"><a href="assets/news-result.png" target="_blank"><img src="assets/news-result.png" width="1280" height="800" alt="Русскоязычный материал о колонках Razer Mako, подготовленный новостным ботом" loading="lazy"></a><figcaption>Результат обработки в HTML-просмотре. Это сохранённый материал бота.</figcaption></figure></div>
-<div class="video-block"><h3>Пример подготовленного материала</h3><video controls playsinline preload="metadata" poster="assets/news-result.png"><source src="assets/news.mp4" type="video/mp4"><track kind="captions" srclang="ru" label="Русский" src="assets/news.vtt" default></video><p class="caption">Короткий обзор результата LLM-обработки. Видео показывает сохранённый материал.</p></div>
+<ul class="result-stats reveal" aria-label="Результат"><li><strong>3 типа источников</strong><span>RSS, YouTube и email-рассылка в одном процессе</span></li><li><strong>2 формата публикаций</strong><span>подробный обзор и краткое изложение</span></li><li><strong>Готовые посты</strong><span>русский текст, изображения и ссылки на источники</span></li></ul>
+<ul class="tech-tags reveal" aria-label="Технологии"><li>Python</li><li>RSS</li><li>IMAP</li><li>LLM API</li><li>Telegram Bot API</li><li>SQLite</li></ul>
+<div class="video-block reveal"><h3>Пример подготовленного материала</h3><video controls playsinline preload="metadata" poster="assets/news-result.png"><source src="assets/news.mp4" type="video/mp4"><track kind="captions" srclang="ru" label="Русский" src="assets/news.vtt" default></video><p class="caption">Короткий обзор результата LLM-обработки. Видео показывает сохранённый материал.</p></div>
 </article>
 
 <article id="ordering" class="project">
-<div class="project-heading"><p class="eyebrow">02 · Клиент и кухня</p><h2>Прототип сервиса самовывоза</h2><p class="subtitle">Заказ в приложении, приготовление на кухне и бонусы после выдачи.</p></div>
-<div class="story ordering"><div>
+<div class="project-heading reveal"><p class="eyebrow">02 · Клиент и кухня</p><h2>Прототип сервиса самовывоза</h2><p class="subtitle">Заказ в приложении, приготовление на кухне и бонусы после выдачи.</p></div>
+<div class="story ordering reveal"><div>
 <h3>Задача</h3><p>Дать гостю возможность собрать заказ и оплатить самовывоз, а сотруднику кухни — получить этот же заказ и провести его до выдачи.</p>
 <h3>Мой вклад</h3><p>Разработал инициативный прототип для возможной презентации сети SBW: приложение клиента для Android и интерфейс кухни. Связал конструктор блюда, заказ, оплату, статусы приготовления и бонусы. Подключил тестовый эквайринг ЮKassa.</p>
-<h3>Результат</h3><p>Клиент выбирает состав и ресторан, оформляет заказ и следит за его статусом. Кухня принимает заказ, отмечает приготовление и выдачу. После выдачи сервер начисляет бонусы.</p><p class="tech">React · TypeScript · Capacitor · Hono · SQLite · ЮKassa API</p><p class="note">Личная инициатива, не заказ сети. Это демонстрационный прототип: платежи тестовые, реальные рестораны заказы не получают.</p>
+<p class="note">Личная инициатива, не заказ сети. Это демонстрационный прототип: платежи тестовые, реальные рестораны заказы не получают.</p>
 </div><figure class="phone"><a href="assets/ordering-menu.png" target="_blank"><img src="assets/ordering-menu.png" width="430" height="900" alt="Меню приложения самовывоза SBW" loading="lazy"></a><figcaption>Клиентский интерфейс прототипа.</figcaption></figure></div>
-<div class="ordering-media"><div class="video-block"><h3>Конструктор и корзина</h3><video class="phone-video" controls playsinline preload="metadata" poster="assets/ordering-builder.png"><source src="assets/ordering.mp4" type="video/mp4"><track kind="captions" srclang="ru" label="Русский" src="assets/ordering.vtt" default></video><p class="caption">Запись интерфейса: выбор блюда, размера, хлеба и добавок.</p></div><div class="gallery"><figure><a href="assets/ordering-cart.png" target="_blank"><img src="assets/ordering-cart.png" width="430" height="900" alt="Собранный заказ в корзине" loading="lazy"></a><figcaption>Корзина с выбранным составом.</figcaption></figure><figure><a href="assets/ordering-paid.png" target="_blank"><img src="assets/ordering-paid.png" alt="Статус принятого заказа в Android-приложении" loading="lazy"></a><figcaption>Заказ после тестовой оплаты. Снимок Android-приложения.</figcaption></figure><figure><a href="assets/ordering-bonuses.png" target="_blank"><img src="assets/ordering-bonuses.png" alt="Бонусный баланс и история операций" loading="lazy"></a><figcaption>Баланс и история бонусов. Снимок Android-приложения.</figcaption></figure></div></div>
+<ul class="result-stats reveal" aria-label="Результат"><li><strong>Полный цикл заказа</strong><span>от конструктора блюда до выдачи на кухне</span></li><li><strong>Оплата работает</strong><span>тестовый эквайринг ЮKassa в прототипе</span></li><li><strong>Бонусы после выдачи</strong><span>сервер начисляет их автоматически</span></li></ul>
+<ul class="tech-tags reveal" aria-label="Технологии"><li>React</li><li>TypeScript</li><li>Capacitor</li><li>Hono</li><li>SQLite</li><li>ЮKassa API</li></ul>
+<div class="ordering-media reveal"><div class="video-block"><h3>Конструктор и корзина</h3><video class="phone-video" controls playsinline preload="metadata" poster="assets/ordering-builder.png"><source src="assets/ordering.mp4" type="video/mp4"><track kind="captions" srclang="ru" label="Русский" src="assets/ordering.vtt" default></video><p class="caption">Запись интерфейса: выбор блюда, размера, хлеба и добавок.</p></div><div class="gallery"><figure><a href="assets/ordering-cart.png" target="_blank"><img src="assets/ordering-cart.png" width="430" height="900" alt="Собранный заказ в корзине" loading="lazy"></a><figcaption>Корзина с выбранным составом.</figcaption></figure><figure><a href="assets/ordering-paid.png" target="_blank"><img src="assets/ordering-paid.png" alt="Статус принятого заказа в Android-приложении" loading="lazy"></a><figcaption>Заказ после тестовой оплаты. Снимок Android-приложения.</figcaption></figure><figure><a href="assets/ordering-bonuses.png" target="_blank"><img src="assets/ordering-bonuses.png" alt="Бонусный баланс и история операций" loading="lazy"></a><figcaption>Баланс и история бонусов. Снимок Android-приложения.</figcaption></figure></div></div>
 </article>
 
 <article id="community" class="project">
-<div class="project-heading"><p class="eyebrow">03 · Веб-продукт и интеграции</p><h2>Сайт закрытого сообщества</h2><p class="subtitle">Знакомство с проектом, подготовка заявки, справка и связанные учётные записи.</p></div>
-<figure class="wide"><a href="assets/community-home.png" target="_blank"><img src="assets/community-home.png" width="1280" height="800" alt="Главная страница сайта True Order" loading="lazy"></a><figcaption>True Order — личный некоммерческий проект.</figcaption></figure>
-<div class="columns"><div><h3>Задача</h3><p>Создать понятную точку входа в сообщество: объяснить правила, подготовить человека к заявке и помочь найти ответы. Связать сайт, Discord и серверную авторизацию.</p></div><div><h3>Мой вклад</h3><p>Отвечал за техническую реализацию сайта и интеграций. Разработал пользовательские сценарии и поиск по справке. Добавил в веб-админку смену имени с сохранением постоянного ID и истории пользователя. Концепция и творческое руководство проектом — Elder.</p></div><div><h3>Результат</h3><p>На сайте работают подготовка к заявке и поиск ответов по всей справке. Административная операция согласует имя в авторизации, статистике и на сайте, сохраняя учётную запись пользователя.</p></div></div>
-<p class="tech">Next.js · React · TypeScript · Python · SQLite · Discord API</p><p class="note">Показана локальная версия сайта. Полный публичный запуск проекта ещё в подготовке; административные операции в видео не выполняются.</p>
-<div class="video-block"><h3>Заявка и поиск по справке</h3><video controls playsinline preload="metadata" poster="assets/community-search.png"><source src="assets/community.mp4" type="video/mp4"><track kind="captions" srclang="ru" label="Русский" src="assets/community.vtt" default></video><p class="caption">Запись интерфейса: памятка перед заявкой и поиск ответа по запросу «вайп».</p></div>
-<div class="desktop-gallery"><figure><a href="assets/community-join.png" target="_blank"><img src="assets/community-join.png" width="1280" height="800" alt="Памятка перед переходом к заявке в сообщество" loading="lazy"></a><figcaption>Порядок доступа и правила перед заявкой.</figcaption></figure><figure><a href="assets/community-search.png" target="_blank"><img src="assets/community-search.png" width="1280" height="800" alt="Поиск по справке сайта True Order" loading="lazy"></a><figcaption>Поиск по всей базе ответов.</figcaption></figure></div>
+<div class="project-heading reveal"><p class="eyebrow">03 · Веб-продукт и интеграции</p><h2>Сайт закрытого сообщества</h2><p class="subtitle">Знакомство с проектом, подготовка заявки, справка и связанные учётные записи.</p></div>
+<figure class="wide reveal"><a href="assets/community-home.png" target="_blank"><img src="assets/community-home.png" width="1280" height="800" alt="Главная страница сайта True Order" loading="lazy"></a><figcaption>True Order — личный некоммерческий проект.</figcaption></figure>
+<div class="columns reveal"><div><h3>Задача</h3><p>Создать понятную точку входа в сообщество: объяснить правила, подготовить человека к заявке и помочь найти ответы. Связать сайт, Discord и серверную авторизацию.</p></div><div><h3>Мой вклад</h3><p>Отвечал за техническую реализацию сайта и интеграций. Разработал пользовательские сценарии и поиск по справке. Добавил в веб-админку смену имени с сохранением постоянного ID и истории пользователя. Концепция и творческое руководство проектом — Elder.</p></div><div><h3>Результат</h3><p>На сайте работают подготовка к заявке и поиск ответов по всей справке. Административная операция согласует имя в авторизации, статистике и на сайте, сохраняя учётную запись пользователя.</p></div></div>
+<ul class="result-stats reveal" aria-label="Результат"><li><strong>Поиск по справке</strong><span>ответы по всем материалам сообщества</span></li><li><strong>Единая учётная запись</strong><span>смена имени без потери ID и истории</span></li><li><strong>Сайт в продакшене</strong><span>Next.js, свой домен true-order.ru</span></li></ul>
+<ul class="tech-tags reveal" aria-label="Технологии"><li>Next.js</li><li>React</li><li>TypeScript</li><li>Python</li><li>SQLite</li><li>Discord API</li></ul>
+<p class="note reveal">Показана локальная версия сайта. Полный публичный запуск проекта ещё в подготовке; административные операции в видео не выполняются.</p>
+<div class="video-block reveal"><h3>Заявка и поиск по справке</h3><video controls playsinline preload="metadata" poster="assets/community-search.png"><source src="assets/community.mp4" type="video/mp4"><track kind="captions" srclang="ru" label="Русский" src="assets/community.vtt" default></video><p class="caption">Запись интерфейса: памятка перед заявкой и поиск ответа по запросу «вайп».</p></div>
+<div class="desktop-gallery reveal"><figure><a href="assets/community-join.png" target="_blank"><img src="assets/community-join.png" width="1280" height="800" alt="Памятка перед переходом к заявке в сообщество" loading="lazy"></a><figcaption>Порядок доступа и правила перед заявкой.</figcaption></figure><figure><a href="assets/community-search.png" target="_blank"><img src="assets/community-search.png" width="1280" height="800" alt="Поиск по справке сайта True Order" loading="lazy"></a><figcaption>Поиск по всей базе ответов.</figcaption></figure></div>
+<div class="project-cta reveal"><p>True Order — мой самый большой личный проект: рабочее веб-приложение со своим доменом и продакшен-инфраструктурой. Публичный запуск ещё готовится, но сайт уже можно посмотреть.</p><a class="trueorder-link" href="https://true-order.ru/welcome?ref=portfolio" target="_blank" rel="noopener">Открыть True Order ↗</a></div>
 </article>
+<section class="trust reveal" aria-label="Подтверждения"><div><h3>Рекомендательное письмо</h3><p>От заказчика коммерческого проекта. Предоставлю по запросу вместе с описанием работы под NDA.</p></div><div><h3>Английский C1</h3><p>Сертификат EF SET 68/100, уровень C1 по CEFR. <a href="https://cert.efset.org/xPjQBT" target="_blank" rel="noopener">Открыть сертификат ↗</a></p></div><div><h3>Работа с AI-агентами</h3><p>Ставлю задачи и критерии приёмки, проверяю результат в пользовательских сценариях и довожу до работающего продукта.</p></div></section>
 <footer><h2>Обсудим вашу задачу</h2><p>Антон Миненко · Санкт-Петербург</p><a href="mailto:SSalvadoRR_official@mail.ru">SSalvadoRR_official@mail.ru ↗</a><p class="caption">Личные проекты. Коммерческие работы под NDA в портфолио не представлены.</p></footer>
-</main></body></html>
+</main><script type="module" src="assets/trueorder-background.js"></script>
+<script>
+(function(){
+  var els = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var pending = false;
+  function sweep(){
+    pending = false;
+    var limit = window.innerHeight * 0.96;
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].classList.contains('visible')) continue;
+      if (els[i].getBoundingClientRect().top < limit) els[i].classList.add('visible');
+    }
+  }
+  function request(){ if (!pending) { pending = true; requestAnimationFrame(sweep); } }
+  window.addEventListener('scroll', request, { passive: true });
+  window.addEventListener('resize', request);
+  sweep();
+})();
+</script></body></html>
