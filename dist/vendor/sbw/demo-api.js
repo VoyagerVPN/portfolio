@@ -554,6 +554,13 @@
     return nativeFetch(input, init);
   };
 
+  // Экран телефона: без видимых скроллбаров, прокрутка не цепляется за страницу
+  var phoneStyle = document.createElement("style");
+  phoneStyle.textContent =
+    "html,body{scrollbar-width:none;overscroll-behavior:contain}" +
+    "::-webkit-scrollbar{width:0;height:0;display:none}";
+  document.head.appendChild(phoneStyle);
+
   // Диагностика: список перехваченных вызовов для проверочных скриптов.
   window.__SBW_DEMO_DEBUG__ = { calls: callLog };
 })();
