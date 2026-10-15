@@ -610,9 +610,15 @@
         if (!usedToday()) setInputEnabled(true);
         return;
       }
-      markUsed();
-      setInputEnabled(false, USED_NOTE);
-      renderBotPost(body); // статус «печатает…» гаснет в конце набора ответа
+      if (body.unlimited){
+        // белый список IP: поле остаётся активным, флаг localStorage не пишется
+        setInputEnabled(false);
+        renderBotPost(body).then(function(){ setInputEnabled(true); });
+      } else {
+        markUsed();
+        setInputEnabled(false, USED_NOTE);
+        renderBotPost(body);
+      } // статус «печатает…» гаснет в конце набора ответа
     }).catch(function(){
       ind.remove();
       setStatus(false);
