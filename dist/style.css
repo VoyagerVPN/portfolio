@@ -122,6 +122,12 @@ footer .caption { margin-top: 38px; }
 .result-stats .ico { width: 20px; height: 20px; flex: none; margin-top: 3px; color: var(--heading); }
 .result-stats strong { display: block; font-family: var(--font-commissioner); font-size: 19px; font-weight: 550; letter-spacing: -.01em; color: var(--heading); margin-bottom: 8px; }
 .result-stats span { font-size: 14.5px; line-height: 1.55; color: rgb(181 181 181 / 75%); }
+.how { margin: 34px 0 0; }
+.how h3 { margin: 0 0 14px; }
+.how ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.how li { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.6; color: rgb(181 181 181 / 75%); }
+.how .ico { width: 20px; height: 20px; flex: none; margin-top: 3px; color: var(--heading); }
+.how strong { color: var(--heading); font-weight: 550; }
 .project-cta { margin-top: 54px; border: 1px solid var(--border); background: rgb(5 5 5 / 55%); padding: 40px 44px; display: flex; align-items: center; justify-content: space-between; gap: 36px; flex-wrap: wrap; }
 .project-cta p { max-width: 660px; margin: 0; font-size: 17px; line-height: 1.6; color: rgb(181 181 181 / 85%); }
 .trueorder-link { display: inline-flex; align-items: center; min-height: 58px; padding: 16px 34px; background: var(--heading); color: #000; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .18em; text-decoration: none; white-space: nowrap; box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%); }
