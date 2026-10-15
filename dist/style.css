@@ -16,10 +16,11 @@
 *::selection { background: rgb(128 128 128 / 40%); color: #f0f0f0; }
 html { scroll-behavior: smooth; scroll-padding-top: 110px; }
 body { margin: 0; position: relative; background: var(--background); color: var(--foreground); font: 17px/1.6 var(--font-inter); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden; }
-/* Фон — часть потока страницы (как на true-order): скроллится вместе с контентом */
-#trueorder-background { position: absolute; top: 0; left: 0; right: 0; height: 100svh; z-index: 0; pointer-events: none; overflow: hidden; background: #050505; -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%); mask-image: linear-gradient(to bottom, #000 70%, transparent 100%); }
+/* Фон как в True Order: канвас закреплён на весь вьюпорт, а 3D-сцена
+   сдвигается скриптом пропорционально прокрутке (пин по [data-scroll-pin]) */
+#trueorder-background { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background: #050505; }
 .background-scene, .background-fallback { position: absolute; inset: 0; background: #050505; }
-.background-noise { position: absolute; inset: 0; z-index: 1; opacity: .03; mix-blend-mode: overlay; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+.background-noise { position: fixed; inset: 0; z-index: 1; opacity: .03; mix-blend-mode: overlay; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
 a { color: inherit; text-underline-offset: 5px; transition: color 180ms ease-out, background-color 180ms ease-out, border-color 180ms ease-out; }
 a:hover { color: #fff; }
 a:focus-visible, video:focus-visible { outline: 2px solid var(--heading); outline-offset: 5px; }
