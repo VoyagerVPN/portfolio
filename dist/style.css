@@ -65,14 +65,20 @@ video { display: block; width: 100%; max-height: 650px; background: #050505; bor
 footer { border-top: 1px solid var(--border); padding: 80px 0 100px; }
 footer h2 { font-size: clamp(32px,4vw,48px); }
 footer > a { display: inline-block; max-width: 100%; overflow-wrap: anywhere; color: var(--heading); }
-footer .footer-line { display: flex; width: fit-content; align-items: center; gap: 10px; margin: 12px 0 0; font-size: 17px; }
+.footer-who { margin: 12px 0 22px; }
+.footer-who .who-name { margin: 0; font-family: var(--font-commissioner); font-size: 21px; font-weight: 550; letter-spacing: -.01em; color: var(--heading); }
+.footer-who .who-city { display: flex; align-items: center; gap: 8px; margin: 6px 0 0; font-size: 14.5px; color: rgb(181 181 181 / 65%); }
+.footer-contacts { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0; }
+.footer-contacts .footer-line { display: flex; width: fit-content; align-items: center; gap: 10px; margin: 0; font-size: 17px; text-decoration: none; color: rgb(181 181 181 / 75%); }
+.footer-contacts a.footer-line { transition: color 180ms ease-out; }
+.footer-contacts a.footer-line:hover { color: #fff; }
 .contact-mail { gap: 8px; }
 .copy-mail { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-left: 2px; padding: 0; border: 0; background: none; color: rgb(181 181 181 / 60%); cursor: pointer; transition: color 180ms ease-out; }
 .copy-mail:hover { color: #fff; }
 .copy-mail .check-i { display: none; color: #8fd18f; }
 .copy-mail.is-copied .copy-i { display: none; }
 .copy-mail.is-copied .check-i { display: block; }
-footer a.footer-line { color: var(--heading); }
+
 footer .caption { margin-top: 38px; }
 @media (max-width: 1023px) {
   .top { padding: 24px; flex-wrap: wrap; gap: 14px 20px; }
