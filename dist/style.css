@@ -68,7 +68,7 @@ footer > a { display: inline-block; max-width: 100%; overflow-wrap: anywhere; co
 .footer-who { margin: 12px 0 22px; }
 .footer-who .who-name { margin: 0; font-family: var(--font-commissioner); font-size: 21px; font-weight: 550; letter-spacing: -.01em; color: var(--heading); }
 .footer-who .who-city { display: flex; align-items: center; gap: 8px; margin: 6px 0 0; font-size: 14.5px; color: rgb(181 181 181 / 65%); }
-.footer-contacts { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0; }
+.footer-contacts { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px 32px; margin: 0; }
 .footer-contacts .footer-line { display: flex; width: fit-content; align-items: center; gap: 10px; margin: 0; font-size: 17px; text-decoration: none; color: rgb(181 181 181 / 75%); }
 .footer-contacts a.footer-line { transition: color 180ms ease-out; }
 .footer-contacts a.footer-line:hover { color: #fff; }
